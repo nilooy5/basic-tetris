@@ -1,69 +1,58 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // code here
-    const grid = document.querySelector('.grid')
-    const score = document.querySelector('#score')
-    const start = document.querySelector('#start-button')
-    const width = 10
-    let squares = Array.from(document.querySelectorAll('.grid div'))
+    const grid = document.querySelector('.grid');
+    const score = document.querySelector('#score');
+    const start = document.querySelector('#start-button');
+    const width = 10;
+    let squares = Array.from(document.querySelectorAll('.grid div'));
 
-    let firstName = 'Niloy'
+    const tetraminos = [lTetromino, zTetromino, tTetromino, oTetromino, iTetromino];
 
-    let names = ['Fazal', 'Niloy', 'Munira', 'Tabassum']
+    let currentPosition = 4;
+    let currentRotation = 0;
 
-    function showAlert(name) {
-        alert('Welcome ' + name + '!')
-    }
-
-    //The Tetrominoes
-    const lTetromino = [
-        [1, width + 1, width * 2 + 1, 2],
-        [width, width + 1, width + 2, width * 2 + 2],
-        [1, width + 1, width * 2 + 1, width * 2],
-        [width, width * 2, width * 2 + 1, width * 2 + 2]
-    ]
-
-    const zTetromino = [
-        [0, width, width + 1, width * 2 + 1],
-        [width + 1, width + 2, width * 2, width * 2 + 1],
-        [0, width, width + 1, width * 2 + 1],
-        [width + 1, width + 2, width * 2, width * 2 + 1]
-    ]
-
-    const tTetromino = [
-        [1, width, width + 1, width + 2],
-        [1, width + 1, width + 2, width * 2 + 1],
-        [width, width + 1, width + 2, width * 2 + 1],
-        [1, width, width + 1, width * 2 + 1]
-    ]
-
-    const oTetromino = [
-        [0, 1, width, width + 1],
-        [0, 1, width, width + 1],
-        [0, 1, width, width + 1],
-        [0, 1, width, width + 1]
-    ]
-
-    const iTetromino = [
-        [1, width + 1, width * 2 + 1, width * 3 + 1],
-        [width, width + 1, width + 2, width + 3],
-        [1, width + 1, width * 2 + 1, width * 3 + 1],
-        [width, width + 1, width + 2, width + 3]
-    ]
-
-    const tetraminos = [lTetromino, zTetromino, tTetromino, oTetromino, iTetromino]
-
-    let currentPosition = 4
-    let current = tetraminos[0][0]
+    // randomly select a tetramino
+    let random = Math.floor(Math.random()*tetraminos.length);
+    console.log(random);
     
-    console.log(tetraminos);
+    let current = tetraminos[random][currentRotation];
 
-    // draw the first rotation of first tetramino
+    // draw the tetramino
     function draw() {
         current.forEach(index => {
-            squares[currentPosition + index].classList.add('tetramino')
+            squares[currentPosition + index].classList.add('tetramino');
+        })
+    }
+    // undraw the tetramino
+    function undraw() {
+        current.forEach(index => {
+            squares[currentPosition + index].classList.remove('tetramino');
         })
     }
 
-    draw()
+    draw();
+
+    // make the tetramino move down every second
+    timerID = setInterval(moveDown, 1000);
+
+    // move down
+    function moveDown() {
+        undraw();
+        currentPosition += width;
+        draw();
+        freeze();
+    }
+
+    // freeze tetramino
+    function freeze() {
+        if(current.some(index => squares[currentPosition + index + width].classList.contains('taken'))) {
+            current.forEach(index => squares[currentPosition + index].classList.add('taken'));
+            //start new tetramino falling
+            random = Math.floor(Math.random() * tetraminos.length);
+            current = tetraminos[random][currentRotation];
+            currentPosition = 4;
+            draw();
+        }
+    }
 })
